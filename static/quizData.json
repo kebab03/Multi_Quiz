@@ -1,0 +1,34 @@
+[
+    {
+        "question": "Match the Capital Cities by size of population",
+        "type": "drag",
+        "answers": [
+            { "text": "Paris", "correct": true },
+            { "text": "Berlin", "correct": true },
+            { "text": "Rome", "correct": true },
+            { "text": "Tokyo", "correct": true }
+        ],
+        "itemsInOrder": ["Paris", "Berlin", "Tokyo", "Rome"]
+    },
+    {
+        "question": "Which is the capital of Italy?",
+        "type": "radio",
+        "answers": [
+            { "text": "Paris", "correct": false },
+            { "text": "Berlin", "correct": false },
+            { "text": "Rome", "correct": true },
+            { "text": "Tokyo", "correct": false }
+        ]
+    }
+    ,
+    {
+        "question": "Which is the capital of France?",
+        "type": "radio",
+        "answers": [
+            { "text": "Paris", "correct": true },
+            { "text": "Berlin", "correct": false },
+            { "text": "Rome", "correct": false },
+            { "text": "Tokyo", "correct": false }
+        ]
+    }
+]

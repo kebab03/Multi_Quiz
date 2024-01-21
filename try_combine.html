@@ -1,0 +1,435 @@
+<!--     Almomento legge sono file da {% template/static/quizData.json %}-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>General WORK FINE Quiz</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <style>
+        .option {
+            margin: 5px;
+            padding: 10px;
+            border: 1px solid #22ac39;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .option.drop-zone {
+            border: 2px dashed #f304df;
+        }
+
+        .option.dragging {
+            opacity: 0.5;
+        }
+
+        .option:hover {
+            background-color: #daf10b;
+            color: #af1616;
+        }
+
+        .correct {
+            color: green;
+        }
+
+        .incorrect {
+            color: red;
+        }
+
+        .btn {
+            margin: 5px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #007bff;
+            color: #c822f1;
+        }
+
+        #score {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="score">Score: 0 / 0</div>
+
+    <div class="quiz-container" id="quiz">
+        <!-- Dynamically generated content for each question will go here -->
+    </div>
+
+    <button id="nextBtn" onclick="nextQuiz()" class="btn btn-primary">Next</button>
+    <button id="resetBtn" onclick="resetQuiz()" class="btn btn-secondary" style="display: none;">Reset</button>
+
+    <script>
+        let optionsContainer;
+        let correctAnswers = 0;
+        const questionsP = [
+            {    
+                question: "Which is the largest animal in the world?",
+                type: "radio",
+                answers: [
+                    { text: "Shark", correct: false },
+                    { text: "Blue whale", correct: true },
+                    { text: "Elephant", correct: false },
+                    { text: "Giraffe", correct: false },
+                ]
+            },
+            {      
+                question: "Which is the smallest country in the world?",
+                type: "radio",
+                answers: [
+                    { text: "Vatican City", correct: true },
+                    { text: "Bhutan", correct: false },
+                    { text: "Nepal", correct: false },
+                    { text: "Sri Lanka", correct: false },
+                ]
+            },
+            {
+                question: "Which is the largest desert in the world?",    
+                type: "radio",
+                answers: [
+                    { text: "Kalahari", correct: false },
+                    { text: "Gobi", correct: false },
+                    { text: "Sahara", correct: false },
+                    { text: "Antarctica", correct: true },
+                ]
+            },
+            {
+                question: "Which is the smallest continent in the world?",    
+                type: "radio",
+                answers: [
+                    { text: "Asia", correct: false },
+                    { text: "Australia", correct: true },
+                    { text: "Arctic", correct: false },
+                    { text: "Africa", correct: false },
+                ]
+            },
+            {
+                question: "Order the Programming Languages",
+                type: "drag",
+                answers: [
+                    { text: "Java", correct: true },
+                    { text: "Python", correct: true },
+                    { text: "Ruby", correct: true },
+                ],
+                itemsInOrder: ["Java", "Python", "Ruby"]
+            },
+    {
+        question: "Order the Colors of the Rainbow",
+        type: "drag",
+        answers: [
+            { text: "Red", correct: true },
+            { text: "Orange", correct: true },
+            { text: "Yellow", correct: true },
+        ],
+        itemsInOrder: ["Red", "Orange", "Yellow"]
+    },{
+    question: "Which planet is known as the Red Planet?",
+    type: "radio",
+    answers: [
+        { text: "Venus", correct: false },
+        { text: "Mars", correct: true },
+        { text: "Jupiter", correct: false },
+        { text: "Saturn", correct: false },
+    ]
+},{
+    question: "Match the Capital Cities by size of population ",
+    type: "drag",
+    answers: [
+        { text: "Paris", correct: true },
+        { text: "Berlin", correct: true },
+        { text: "Rome", correct: true },
+        { text: "Tokyo", correct: true },
+    ],
+    itemsInOrder: ["Paris", "Berlin", "Tokyo", "Rome"]
+},
+            {
+                question: "Which is the  capital of Italy?",    
+                type: "radio",
+                answers: [
+                { text: "Paris", correct: false },
+        { text: "Berlin", correct: false },
+        { text: "Rome", correct: true },
+        { text: "Tokyo", correct: false },
+                ]
+            }
+
+        ];
+
+        let currentQuestion = 0;
+
+        function nextQuiz() {
+            const currentQuiz = document.getElementById("quiz");
+            if (currentQuiz) {
+                currentQuiz.innerHTML = ""; // Clear the content
+
+                currentQuiz.style.display = "none";
+                currentQuestion++;
+
+                if (currentQuestion < questions.length-1) {
+                    const questionData = questions[currentQuestion];
+                    setupQuestion(questionData, currentQuiz);
+                    currentQuiz.style.display = "block";
+                    //document.getElementById("resetBtn").style.display = "none";
+                    //document.getElementById("nextBtn").style.display = "block";
+
+                } else {const questionData = questions[currentQuestion];
+                    setupQuestion(questionData, currentQuiz);
+                    currentQuiz.style.display = "block";
+                    // Quiz completed
+                    document.getElementById("nextBtn").style.display = "none";
+                    document.getElementById("resetBtn").style.display = "block";
+                    console.log(" remove button")
+                    //showCompletionMessage();
+                }
+            } else {
+                console.error(`Quiz container not found for question ${currentQuestion}`);
+            }
+        }
+
+
+        function showCompletionMessage() {
+            const resultElement = document.createElement("div");
+            resultElement.id = "result";
+            resultElement.textContent = "Quiz completed. Click 'Reset' to start again.";
+            resultElement.classList.add("correct");
+            document.getElementById("quiz").appendChild(resultElement);
+        }
+        function setupQuestion(questionData, quiz) {
+            const questionElement = document.createElement("h2");
+            questionElement.id = "question";
+            questionElement.textContent = questionData.question;
+
+            quiz.appendChild(questionElement);
+
+            if (questionData.type === "radio") {
+                setupRadioQuestion(questionData, quiz);
+            } else if (questionData.type === "drag") {
+                setupDragQuestion(questionData, quiz);
+            }
+        }
+
+        function setupRadioQuestion(questionData, quiz) {
+            const answersContainer = document.createElement("div");
+            answersContainer.id = `answers${currentQuestion + 1}`;
+
+            questionData.answers.forEach(answer => {
+                const answerButton = document.createElement("button");
+                answerButton.classList.add("btn");
+                answerButton.textContent = answer.text;
+                answerButton.onclick = function () {
+                    checkAnswer(answer.correct);
+                };
+
+                answersContainer.appendChild(answerButton);
+            });
+
+            quiz.appendChild(answersContainer);
+        }
+
+        function allowDrop(event) {
+    event.preventDefault();
+    const draggedElement = document.getElementById(event.dataTransfer.getData("text"));
+    if (draggedElement !== optionsContainer) {
+        if (event.target.classList.contains("option")) {
+            event.target.classList.add("drop-zone");
+        }
+    }
+}
+
+
+        function dragStart(event) {
+            event.dataTransfer.setData("text/plain", event.target.id);
+            event.target.classList.add("dragging");
+        }
+
+        function drop(event) {
+    event.preventDefault();
+    const draggedId = event.dataTransfer.getData("text");
+    const draggedElement = document.getElementById(draggedId);
+    const dropZone = event.target;
+
+    if (dropZone === optionsContainer) {
+        // If dropping on the optionsContainer, append the dragged element
+        optionsContainer.appendChild(draggedElement);
+    } else if (dropZone.classList.contains("option")) {
+        // Swap the elements if dropping on an option
+        const tempText = draggedElement.textContent;
+        draggedElement.textContent = dropZone.textContent;
+        dropZone.textContent = tempText;
+    }
+
+    // Reset styles
+    if (dropZone.classList.contains("option")) {
+        dropZone.classList.remove("draop-zone");
+    }
+    draggedElement.classList.remove("dragging");
+}
+
+        function checkAnswer(isCorrect) {
+            const resultElement = document.createElement("div");
+            resultElement.id = "result";
+
+            if (isCorrect) {
+                resultElement.textContent = "Correct! Well done!";
+                resultElement.classList.add("correct");
+                correctAnswers++;
+                //nextQuiz()
+            } else {
+                resultElement.textContent = "Incorrect. Try again.";
+                resultElement.classList.add("incorrect");
+            }
+
+            const scoreElement = document.getElementById("score");
+            if (scoreElement) {
+                scoreElement.textContent = `Score: ${correctAnswers} / ${questions.length}`;
+            }
+
+            if (currentQuestion == questions.length - 1) {
+                resultElement.textContent += "Quiz completed. Click 'Next' for the next question.";
+                resultElement.classList.add("correct");
+                document.getElementById("quiz").appendChild(resultElement);
+                return;
+            }
+            document.getElementById("quiz").appendChild(resultElement);
+        }
+
+        function resetQuiz() {
+
+            const scoreElement = document.getElementById("score");
+            if (scoreElement) {correctAnswers=0
+                scoreElement.textContent = `Score: ${correctAnswers} / ${questions.length}`;
+            }
+
+    const quizContainer = document.getElementById("quiz");
+    if (quizContainer) {
+        // Reset question counter
+        currentQuestion = 0;
+
+        // Clear quiz content
+        quizContainer.innerHTML = "";
+
+        // Show the initial quiz
+        setupQuestion(questions[currentQuestion], quizContainer);
+
+        // Show the "Next" button
+        document.getElementById("resetBtn").style.display = "none";
+        document.getElementById("nextBtn").style.display = "block";
+    } else {
+        console.error("Quiz container not found for reset");
+    }
+}
+        function setupDragQuestion(questionData, quiz) {
+    optionsContainer = document.createElement("div");
+    optionsContainer.id = "optionsContainer";
+    optionsContainer.ondrop = drop;
+    optionsContainer.ondragover = allowDrop;
+
+    const itemsInOrder = questionData.itemsInOrder || [];
+
+    questionData.answers.forEach((answer, index) => {
+        const option = document.createElement("div");
+        option.classList.add("option");
+        option.draggable = true;
+        option.id = index.toString();  // Set the id to the index as a string
+        option.textContent = answer.text;
+        option.ondragstart = dragStart;
+
+        optionsContainer.appendChild(option);
+    });
+
+    quiz.appendChild(optionsContainer);
+
+    const checkOrderBtn = document.createElement("button");
+    checkOrderBtn.id = "checkOrderBtn";
+    checkOrderBtn.textContent = "Check Order";
+    checkOrderBtn.onclick = function () {
+        checkOrder(itemsInOrder);
+    };
+
+    quiz.appendChild(checkOrderBtn);
+}
+
+function checkOrder(itemsInOrder) {
+    const resultElement = document.createElement("div");
+    resultElement.id = "result";
+
+    const userOrder = Array.from(optionsContainer.children).map(option => option.textContent);
+    console.log("userOrder-== ", userOrder);
+
+    if (arraysEqual(itemsInOrder, userOrder)) {
+        resultElement.textContent = "Correct! Well done!";
+        resultElement.classList.add("correct");
+        correctAnswers++;
+    } else {
+        resultElement.textContent = "Incorrect. Try again.";
+        resultElement.classList.add("incorrect");
+    }
+
+    const scoreElement = document.getElementById("score");
+    if (scoreElement) {
+        scoreElement.textContent = `Score: ${correctAnswers} / ${questions.length}`;
+    }
+
+    if (currentQuestion == questions.length - 1) {
+        resultElement.textContent += "Quiz completed. Click 'Next' for the next question.";
+        resultElement.classList.add("correct");
+        document.getElementById("quiz").appendChild(resultElement);
+        return;
+    }
+    document.getElementById("quiz").appendChild(resultElement);
+}
+
+
+        function arraysEqual(arr1, arr2) {
+            if (arr1.length !== arr2.length) return false;
+            for (let i = 0; i < arr1.length; i++) {
+                if (arr1[i] !== arr2[i]) return false;
+            }
+            return true;
+        }
+
+        let questions = [];
+       
+
+document.addEventListener("DOMContentLoaded", function () {
+    fetch('static/quizData.json')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Network response was not ok (${response.statusText})`);
+            }
+            return response.json(); // Parse the JSON data
+        })
+        .then(data => {
+            questions = data;
+            console.log("questions ", questions);
+
+            const initialQuiz = document.getElementById("quiz");
+            if (initialQuiz) {
+                initialQuiz.style.display = "block";
+                console.log("questions[0] ", questions[0]);
+                setupQuestion(questions[currentQuestion], initialQuiz);
+            } else {
+                console.error(`Initial quiz container not found for question ${currentQuestion}`);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching or parsing the JSON file:', error);
+        });
+});
+
+    </script>
+</body>
+
+</html>
